@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的知识库</title>
+  
+  <!-- 外部CSS文件 -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- 外部JavaScript库 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header id="main-header" class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-book text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-dark">我的知识库</h1>
+      </div>
+      
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="#dashboard" class="text-gray-600 hover:text-primary transition-colors">仪表盘</a>
+        <a href="#notes" class="text-gray-600 hover:text-primary transition-colors">笔记</a>
+        <a href="#categories" class="text-gray-600 hover:text-primary transition-colors">分类</a>
+        <a href="#tags" class="text-gray-600 hover:text-primary transition-colors">标签</a>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button id="search-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <i class="fa fa-search text-gray-600"></i>
+        </button>
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <i class="fa fa-moon-o text-gray-600"></i>
+        </button>
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <i class="fa fa-bars text-gray-600"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 搜索框 -->
+    <div id="search-container" class="hidden bg-gray-100 py-2 px-4">
+      <div class="container mx-auto">
+        <div class="relative">
+          <input type="text" id="search-input" placeholder="搜索笔记..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50">
+          <i class="fa fa-search absolute left-3 top-3 text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+      <div class="container mx-auto px-4 py-2 flex flex-col space-y-2">
+        <a href="#dashboard" class="py-2 px-4 hover:bg-gray-50 rounded-lg transition-colors">仪表盘</a>
+        <a href="#notes" class="py-2 px-4 hover:bg-gray-50 rounded-lg transition-colors">笔记</a>
+        <a href="#categories" class="py-2 px-4 hover:bg-gray-50 rounded-lg transition-colors">分类</a>
+        <a href="#tags" class="py-2 px-4 hover:bg-gray-50 rounded-lg transition-colors">标签</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="flex-grow container mx-auto px-4 py-6">
+    <!-- 仪表盘 -->
+    <section id="dashboard" class="mb-12">
+      <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-6 flex items-center">
+        <i class="fa fa-tachometer text-primary mr-2"></i>
+        仪表盘
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- 统计卡片 -->
+        <div class="bg-white rounded-xl shadow p-6 card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-600 font-medium">总笔记数</h3>
+            <div class="p-2 rounded-full bg-blue-100">
+              <i class="fa fa-file-text-o text-primary"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold" id="total-notes">0</p>
+          <div class="mt-2 text-sm text-green-600">
+            <i class="fa fa-arrow-up"></i> 较上周增长 12%
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6 card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-600 font-medium">分类数</h3>
+            <div class="p-2 rounded-full bg-purple-100">
+              <i class="fa fa-folder-o text-accent"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold" id="total-categories">0</p>
+          <div class="mt-2 text-sm text-green-600">
+            <i class="fa fa-arrow-up"></i> 较上周增长 5%
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6 card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-600 font-medium">标签数</h3>
+            <div class="p-2 rounded-full bg-green-100">
+              <i class="fa fa-tags text-secondary"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold" id="total-tags">0</p>
+          <div class="mt-2 text-sm text-green-600">
+            <i class="fa fa-arrow-up"></i> 较上周增长 8%
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6 card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-600 font-medium">最近更新</h3>
+            <div class="p-2 rounded-full bg-yellow-100">
+              <i class="fa fa-clock-o text-yellow-500"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold" id="last-updated">--</p>
+          <div class="mt-2 text-sm text-gray-500">
+            <span id="last-note-title">无更新</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 图表 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow p-6 lg:col-span-2">
+          <h3 class="text-lg font-semibold mb-4">笔记增长趋势</h3>
+          <div class="h-64">
+            <canvas id="notes-trend-chart"></canvas>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+          <h3 class="text-lg font-semibold mb-4">分类分布</h3>
+          <div class="h-64">
+            <canvas id="categories-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 笔记列表 -->
+    <section id="notes" class="mb-12">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold flex items-center">
+          <i class="fa fa-sticky-note-o text-primary mr-2"></i>
+          我的笔记
+        </h2>
+        
+        <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+          <div class="relative">
+            <select id="category-filter" class="input-field pr-10 appearance-none bg-white">
+              <option value="">所有分类</option>
+              <!-- 分类选项会通过JS动态生成 -->
+            </select>
+            <i class="fa fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+          </div>
+          
+          <div class="relative">
+            <select id="sort-filter" class="input-field pr-10 appearance-none bg-white">
+              <option value="recent">最近更新</option>
+              <option value="oldest">最早创建</option>
+              <option value="az">按标题 A-Z</option>
+              <option value="za">按标题 Z-A</option>
+            </select>
+            <i class="fa fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+          </div>
+          
+          <button id="add-note-btn" class="btn-primary flex items-center justify-center">
+            <i class="fa fa-plus mr-2"></i>
+            新建笔记
+          </button>
+        </div>
+      </div>
+      
+      <!-- 笔记网格 -->
+      <div id="notes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 笔记卡片将通过JavaScript动态生成 -->
+      </div>
+      
+      <!-- 无笔记提示 -->
+      <div id="no-notes" class="hidden py-12 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+          <i class="fa fa-file-text-o text-primary text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-medium text-gray-700 mb-2">还没有笔记</h3>
+        <p class="text-gray-500 mb-6">点击"新建笔记"按钮开始创建你的第一个笔记</p>
+        <button id="create-first-note" class="btn-primary">
+          <i class="fa fa-plus mr-2"></i>
+          新建笔记
+        </button>
+      </div>
+    </section>
+    
+    <!-- 分类和标签 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- 分类 -->
+      <section id="categories">
+        <h2 class="text-[clamp(1.25rem,2vw,1.75rem)] font-bold mb-6 flex items-center">
+          <i class="fa fa-folder-o text-accent mr-2"></i>
+          笔记分类
+        </h2>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-lg">分类列表</h3>
+            <button id="add-category-btn" class="btn-secondary text-sm flex items-center">
+              <i class="fa fa-plus mr-1"></i> 添加分类
+            </button>
+          </div>
+          
+          <div id="categories-list" class="space-y-3">
+            <!-- 分类将通过JavaScript动态生成 -->
+          </div>
+        </div>
+      </section>
+      
+      <!-- 标签 -->
+      <section id="tags">
+        <h2 class="text-[clamp(1.25rem,2vw,1.75rem)] font-bold mb-6 flex items-center">
+          <i class="fa fa-tags text-secondary mr-2"></i>
+          常用标签
+        </h2>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-lg">热门标签</h3>
+            <button id="view-all-tags" class="text-primary text-sm hover:underline">查看全部</button>
+          </div>
+          
+          <div id="tags-cloud" class="flex flex-wrap gap-2">
+            <!-- 标签将通过JavaScript动态生成 -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-6">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <p class="text-gray-500">&copy; 2025 我的知识库. 保留所有权利.</p>
+        </div>
+        
+        <div class="flex space-x-4">
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+            <i class="fa fa-github text-xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+            <i class="fa fa-twitter text-xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+            <i class="fa fa-linkedin text-xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 新建/编辑笔记模态框 -->
+  <div id="note-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-xl font-bold" id="modal-title">新建笔记</h3>
+        <button id="close-modal" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <i class="fa fa-times text-gray-600"></i>
+        </button>
+      </div>
+      
+      <div class="flex-grow overflow-y-auto p-6">
+        <div class="mb-4">
+          <label for="note-title" class="block text-sm font-medium text-gray-700 mb-1">标题</label>
+          <input type="text" id="note-title" class="input-field" placeholder="输入笔记标题">
+        </div>
+        
+        <div class="mb-4">
+          <label for="note-category" class="block text-sm font-medium text-gray-700 mb-1">分类</label>
+          <select id="note-category" class="input-field">
+            <!-- 分类选项会通过JS动态生成 -->
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label for="note-tags" class="block text-sm font-medium text-gray-700 mb-1">标签</label>
+          <input type="text" id="note-tags" class="input-field" placeholder="用逗号分隔多个标签，如：Python,编程,学习">
+        </div>
+        
+        <div class="mb-6">
+          <label for="note-content" class="block text-sm font-medium text-gray-700 mb-1">内容</label>
+          <div id="note-content" contenteditable="true" class="input-field min-h-[200px]" placeholder="输入笔记内容..."></div>
+        </div>
+      </div>
+      
+      <div class="p-4 border-t border-gray-200 flex justify-end space-x-3">
+        <button id="delete-note" class="hidden btn-secondary text-red-600 hover:bg-red-50">
+          <i class="fa fa-trash mr-2"></i> 删除笔记
+        </button>
+        <button id="insert-image-btn" class="btn-secondary">
+          <i class="fa fa-image mr-2"></i> 插入图片
+        </button>
+        <button id="cancel-note" class="btn-secondary">取消</button>
+        <button id="save-note" class="btn-primary">保存笔记</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建分类模态框 -->
+  <div id="category-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-xl font-bold">新建分类</h3>
+        <button id="close-category-modal" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <i class="fa fa-times text-gray-600"></i>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <div class="mb-4">
+          <label for="category-name" class="block text-sm font-medium text-gray-700 mb-1">分类名称</label>
+          <input type="text" id="category-name" class="input-field" placeholder="输入分类名称">
+        </div>
+        
+        <div class="mb-6">
+          <label for="category-color" class="block text-sm font-medium text-gray-700 mb-1">分类颜色</label>
+          <div class="flex space-x-2">
+            <button class="category-color-btn w-8 h-8 rounded-full bg-blue-500 border-2 border-white" data-color="blue"></button>
+            <button class="category-color-btn w-8 h-8 rounded-full bg-green-500 border-2 border-white" data-color="green"></button>
+            <button class="category-color-btn w-8 h-8 rounded-full bg-purple-500 border-2 border-white" data-color="purple"></button>
+            <button class="category-color-btn w-8 h-8 rounded-full bg-yellow-500 border-2 border-white" data-color="yellow"></button>
+            <button class="category-color-btn w-8 h-8 rounded-full bg-red-500 border-2 border-white" data-color="red"></button>
+            <button class="category-color-btn w-8 h-8 rounded-full bg-gray-500 border-2 border-white" data-color="gray"></button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-4 border-t border-gray-200 flex justify-end space-x-3">
+        <button id="cancel-category" class="btn-secondary">取消</button>
+        <button id="save-category" class="btn-primary">保存分类</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 外部JavaScript文件 -->
+  <script src="app.js"></script>
+</body>
+</html>
